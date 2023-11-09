@@ -2,35 +2,42 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const { json } = require("body-parser");
 
-exports.signup = (req, res) => {
-  const { name, email, password, role } = req.body;
-  console.log(req.body);
+exports.signup = (req, res, next) => {
+  const { name, email, role, password } = req.body;
+
   try {
     User.findOne({ email }).exec((err, user) => {
       if (user) {
-        return res.status(400).json({
-          error: "Email is taken",
-        });
+        const error = new ApiErrors(400, "Email is taken");
+        throw next(error);
       } else {
         let newUser = new User({
           name,
+          role,
           email,
           password,
-          role,
         });
 
         newUser.save();
+        const data = {
+          statusCode: 200,
+          success: true,
+          message: "Signup success! Please sign in",
+          data: newUser,
+        };
+
         res.json({
-          message: "Signup success! Please signin",
+          data,
+          message: "Signup success! Please sign in",
         });
       }
     });
   } catch (error) {
-    return res.status(400).json(error);
+    throw next(new ApiErrors(500, "Something went wrong"));
   }
 };
 
-exports.signin = (req, res) => {
+exports.signin = (req, res, next) => {
   const { email, password } = req.body;
 
   // check if user exist
@@ -46,20 +53,25 @@ exports.signin = (req, res) => {
         error: "Email and password do not match",
       });
     }
-    // generate a token and send to client
+
     if (
-      user.role == "user" ||
+      user?.role === "super-admin" ||
       user.role === "admin" ||
-      user.role === "super-admin"
+      user.role === "user"
     ) {
+      // generate a token and send to client
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
       });
-      const { _id, name, email } = user;
+      const { _id, name, role, email } = user;
 
       return res.json({
         token,
-        user: { _id, name, email },
+        user: { _id, name, role, email },
+      });
+    } else {
+      return res.status(400).json({
+        error: "You are not admin user",
       });
     }
   });

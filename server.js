@@ -27,6 +27,7 @@ app.use(cors()); // allows all origins
 // routes attached with server
 app.use("/api", require("./routes/auth"));
 app.use("/api", require("./routes/orderData"));
+app.use("/api", require("./routes/dashboard"));
 
 //app.use("/api", require("./routes/auth"));
 
