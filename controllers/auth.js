@@ -60,14 +60,17 @@ exports.signin = (req, res, next) => {
       user.role === "user"
     ) {
       // generate a token and send to client
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "7d",
-      });
+      const token = jwt.sign(
+        { _id: user._id, email: user.email, role: user.role, name: user.name },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
       const { _id, name, role, email } = user;
 
       return res.json({
         token,
-        user: { _id, name, role, email },
       });
     } else {
       return res.status(400).json({
