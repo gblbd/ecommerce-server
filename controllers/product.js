@@ -6,35 +6,34 @@ const imageHostKey = "79e6ec2db50a9ac8dbdb3b42a1accc92";
 exports.addProduct = async (req, res) => {
   try {
     const { title, category, price, details } = req.body;
-    console.log("req.files:", req.files);
+    console.log("req.files:", req.body.images);
 
-    // Check if files are present in the request
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).json({ message: "No files were uploaded." });
+    let images = [];
+    for (let index = 0; index < req.body.images.length; index++) {
+      const element = req.body.images[index];
+
+      //let elementData = element.originalName;
+      //elementData = elementData.split(".");
+
+      const bodyData = new FormData();
+      const imageData = element.split(",")[1].trim();
+      bodyData.append("image", imageData);
+
+      // Upload the image
+      const response = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${imageHostKey}`,
+        bodyData,
+        {
+          headers: {
+            ...bodyData.getHeaders(), // Include headers from FormData
+          },
+        }
+      );
+
+      const imageUrls = response.data.data.url;
+
+      images.push(imageUrls);
     }
-
-    // Create a FormData object and append each image data
-    const bodyData = new FormData();
-    Object.values(req.files).forEach((file, index) => {
-      const imageData = file.data; // Assuming 'data' property contains the image content
-      bodyData.append(`image${index}`, file.data, {
-        filename: file.name,
-        contentType: file.mimetype,
-      });
-    });
-
-    // Upload the images
-    const imgbbResponse = await axios.post(
-      `https://api.imgbb.com/1/upload?key=${imageHostKey}`, // Replace with your imgbb API key
-      bodyData,
-      {
-        headers: {
-          ...bodyData.getHeaders(), // Include headers from FormData
-        },
-      }
-    );
-
-    const imgbbImageUrls = imgbbResponse.data.data.images.map((img) => img.url);
 
     // Create a new product with the updated image URLs
     const newProduct = new product({
@@ -42,7 +41,7 @@ exports.addProduct = async (req, res) => {
       category,
       price,
       details,
-      images: imgbbImageUrls,
+      images,
     });
 
     // Save the product to the database
