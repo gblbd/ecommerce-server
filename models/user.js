@@ -12,8 +12,8 @@ const userScheama = new mongoose.Schema(
     role: {
       type: String,
       trim: true,
-
       max: 32,
+      default: "user",
     },
 
     email: {

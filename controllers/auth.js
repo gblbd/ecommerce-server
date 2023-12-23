@@ -8,8 +8,7 @@ exports.signup = (req, res, next) => {
   try {
     User.findOne({ email }).exec((err, user) => {
       if (user) {
-        const error = new ApiErrors(400, "Email is taken");
-        throw next(error);
+        return res.json("User email Already exists");
       } else {
         let newUser = new User({
           name,
@@ -33,7 +32,10 @@ exports.signup = (req, res, next) => {
       }
     });
   } catch (error) {
-    throw next(new ApiErrors(500, "Something went wrong"));
+    res.json({
+      message: "sign up failed",
+      error,
+    });
   }
 };
 
@@ -64,7 +66,7 @@ exports.signin = (req, res, next) => {
         { _id: user._id, email: user.email, role: user.role, name: user.name },
         process.env.JWT_SECRET,
         {
-          expiresIn: "7d",
+          expiresIn: "365d",
         }
       );
       const { _id, name, role, email } = user;
