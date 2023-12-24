@@ -21,6 +21,7 @@ exports.addToCart = async (req, res) => {
     let cartItem = await Cart.findOne({
       userId,
       productId,
+      orderStatus: false,
     });
 
     if (cartItem) {
