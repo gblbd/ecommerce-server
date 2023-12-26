@@ -18,16 +18,23 @@ exports.signup = (req, res, next) => {
         });
 
         newUser.save();
-        const data = {
-          statusCode: 200,
-          success: true,
-          message: "Signup success! Please sign in",
-          data: newUser,
-        };
+
+        const token = jwt.sign(
+          {
+            _id: newUser._id,
+            email: newUser.email,
+            role: newUser.role,
+            name: newUser.name,
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "365d",
+          }
+        );
 
         res.json({
-          data,
-          message: "Signup success! Please sign in",
+          token,
+          message: "Signup success!",
         });
       }
     });
