@@ -6,20 +6,15 @@ const imageHostKey = "79e6ec2db50a9ac8dbdb3b42a1accc92";
 exports.addProduct = async (req, res) => {
   try {
     const { title, category, price, details } = req.body;
-    console.log("req.files:", req.body.images);
 
     let images = [];
     for (let index = 0; index < req.body.images.length; index++) {
       const element = req.body.images[index];
 
-      //let elementData = element.originalName;
-      //elementData = elementData.split(".");
-
       const bodyData = new FormData();
       const imageData = element.split(",")[1].trim();
       bodyData.append("image", imageData);
 
-      // Upload the image
       const response = await axios.post(
         `https://api.imgbb.com/1/upload?key=${imageHostKey}`,
         bodyData,
