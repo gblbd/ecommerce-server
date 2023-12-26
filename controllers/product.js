@@ -20,7 +20,7 @@ exports.addProduct = async (req, res) => {
         bodyData,
         {
           headers: {
-            ...bodyData.getHeaders(), // Include headers from FormData
+            ...bodyData.getHeaders(),
           },
         }
       );

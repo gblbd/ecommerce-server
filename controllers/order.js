@@ -43,3 +43,24 @@ exports.getOrders = async (req, res) => {
     res.status(500).json({ error: "Failed to get orders" });
   }
 };
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate({
+        path: "userId",
+      })
+      .populate({
+        path: "cartId",
+        populate: {
+          path: "productId",
+          model: "Product",
+        },
+      });
+
+    res.status(200).json({ success: true, data: orders });
+  } catch (error) {
+    console.error("Error getting orders:", error);
+    res.status(500).json({ error: "Failed to get orders" });
+  }
+};

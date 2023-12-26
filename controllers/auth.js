@@ -63,13 +63,19 @@ exports.signin = (req, res, next) => {
     ) {
       // generate a token and send to client
       const token = jwt.sign(
-        { _id: user._id, email: user.email, role: user.role, name: user.name },
+        {
+          _id: user._id,
+          email: user.email,
+          role: user.role,
+          name: user.name,
+          phone: user.phone,
+          address: user.address,
+        },
         process.env.JWT_SECRET,
         {
           expiresIn: "365d",
         }
       );
-      const { _id, name, role, email } = user;
 
       return res.json({
         token,
@@ -121,17 +127,21 @@ exports.userDelete = async (req, res) => {
 };
 //update list
 exports.userUpdateData = async (req, res) => {
-  const { name, email, id } = req.body;
+  const userId = req.ID;
+  const { address } = req.body;
+  try {
+    const updatedUser = await User.findById(userId);
 
-  await User.findByIdAndUpdate(id, {
-    $set: {
-      name: name,
-      email: email,
-    },
-  });
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-  return res.json({
-    name: name,
-    email: email,
-  });
+    updatedUser.address = address;
+    await updatedUser.save();
+
+    return res.json({ message: "User updated successfully", updatedUser });
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 };
