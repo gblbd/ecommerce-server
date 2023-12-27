@@ -66,7 +66,7 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 exports.getOrderDetails = async (req, res) => {
-  const orderIdToRetrieve = req.params.orderId; // Assuming the order ID is part of the request parameters
+  const orderIdToRetrieve = req.params.orderId;
 
   try {
     const orderDetails = await Order.findById(orderIdToRetrieve);
