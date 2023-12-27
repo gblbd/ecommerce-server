@@ -1,11 +1,12 @@
 const cart = require("../models/cart");
 const Order = require("../models/order");
-
-let orderIdCounter = 200;
+const moment = require("moment");
 
 exports.postOrder = async (req, res) => {
   const userId = req.ID;
-  const orderId = orderIdCounter++;
+  const currentDateTime = moment().format("YYYY-MM-DD-HH-mm");
+  const orderId = `${currentDateTime}`;
+
   try {
     const result = await Order.create({
       orderId: orderId,
@@ -62,5 +63,38 @@ exports.getAllOrders = async (req, res) => {
   } catch (error) {
     console.error("Error getting orders:", error);
     res.status(500).json({ error: "Failed to get orders" });
+  }
+};
+exports.getOrderDetails = async (req, res) => {
+  const orderIdToRetrieve = req.params.orderId; // Assuming the order ID is part of the request parameters
+
+  try {
+    const orderDetails = await Order.findById(orderIdToRetrieve);
+
+    if (!orderDetails) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    return res.json({ success: true, data: orderDetails });
+  } catch (error) {
+    console.error("Error retrieving order details:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  const orderIdToDelete = req.params.orderId;
+
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(orderIdToDelete);
+
+    if (!deletedOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    return res.json({ message: "Order deleted successfully", deletedOrder });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
