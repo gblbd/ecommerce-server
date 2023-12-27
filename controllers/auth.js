@@ -135,15 +135,21 @@ exports.userDelete = async (req, res) => {
 //update list
 exports.userUpdateData = async (req, res) => {
   const userId = req.ID;
-  const { address } = req.body;
+  const { address, phone } = req.body;
   try {
     const updatedUser = await User.findById(userId);
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
+    if (address !== undefined) {
+      updatedUser.address = address;
+    }
 
-    updatedUser.address = address;
+    if (phone !== undefined) {
+      updatedUser.phone = phone;
+    }
+    // updatedUser.address = address;
     await updatedUser.save();
 
     return res.json({ message: "User updated successfully", updatedUser });
