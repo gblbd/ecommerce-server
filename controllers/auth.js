@@ -107,10 +107,9 @@ exports.userListData = async (req, res) => {
 };
 //read user
 exports.read = async (req, res) => {
-  const _id = req.params.id;
-  console.log("gfg", _id);
+  const userId = req.ID;
 
-  User.findById(_id).exec((err, user) => {
+  User.findById(userId).exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
         error: "User not found",
@@ -120,6 +119,7 @@ exports.read = async (req, res) => {
     res.json(user);
   });
 };
+
 //delete user
 exports.userDelete = async (req, res) => {
   try {

@@ -22,6 +22,6 @@ router.post("/signup", userSignupValidator, runValidation, signup);
 router.post("/signin", userSigninValidator, runValidation, signin);
 router.get("/user-list", userListData);
 router.delete("/user-delete", authenticate, userDelete);
-router.get("/user-details/:id", authenticate, read);
+router.get("/user-details", authenticate, read);
 router.put("/user-update", authenticate, userUpdateData);
 module.exports = router;
