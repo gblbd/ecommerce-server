@@ -29,8 +29,6 @@ exports.addProduct = async (req, res) => {
 
       images.push(imageUrls);
     }
-
-    // Create a new product with the updated image URLs
     const newProduct = new product({
       title,
       category,
@@ -53,6 +51,66 @@ exports.addProduct = async (req, res) => {
       .json({ error: error.message || "An error occurred" });
   }
 };
+
+exports.updateProductById = async (req, res) => {
+  try {
+    const { title, category, price, details, images } = req.body;
+    console.log("check",req.body)
+
+    let updatedImages = [];
+    if (images && images.length > 0) {
+      for (let index = 0; index < images.length; index++) {
+        const element = images[index];
+
+        const bodyData = new FormData();
+        const imageData = element.split(",")[1].trim();
+        bodyData.append("image", imageData);
+
+        const response = await axios.post(
+          `https://api.imgbb.com/1/upload?key=${imageHostKey}`,
+          bodyData,
+          {
+            headers: {
+              ...bodyData.getHeaders(),
+            },
+          }
+        );
+
+        const imageUrl = response.data.data.url;
+
+        updatedImages.push(imageUrl);
+      }
+    }
+
+    // Find the product by ID and update its details
+    const updatedProduct = await product.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        category,
+        price,
+        details,
+        $push: { images: { $each: updatedImages } }, // Add new images to the existing array
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({
+      data: updatedProduct,
+      message: "Product updated successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(400)
+      .json({ error: error.message || "An error occurred" });
+  }
+};
+
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -81,25 +139,7 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-exports.updateProductById = async (req, res) => {
-  try {
-    const { title, category, price, details, image } = req.body;
-    const updatedProduct = await product.findByIdAndUpdate(
-      req.params.id,
-      { title, category, price, details, image },
-      { new: true } // Return the updated document
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    res.json({
-      data: updatedProduct,
-      message: "Product updated successfully",
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+
 
 exports.deleteProductById = async (req, res) => {
   try {
