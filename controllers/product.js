@@ -90,9 +90,8 @@ exports.updateProductById = async (req, res) => {
         category,
         price,
         details,
-        $push: { images: { $each: updatedImages } }, // Add new images to the existing array
+        images
       },
-      { new: true } // Return the updated document
     );
 
     if (!updatedProduct) {
