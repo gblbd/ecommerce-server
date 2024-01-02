@@ -55,34 +55,66 @@ exports.addProduct = async (req, res) => {
 exports.updateProductById = async (req, res) => {
   try {
     const { title, category, price, details, images } = req.body;
-    console.log("check",req.body)
+    console.log("check", req.body);
 
     let updatedImages = [];
+
     if (images && images.length > 0) {
       for (let index = 0; index < images.length; index++) {
         const element = images[index];
 
-        const bodyData = new FormData();
-        const imageData = element.split(",")[1].trim();
-        bodyData.append("image", imageData);
+        if (!element) {
+          console.error("Image element is undefined at index:", index);
+          continue;
+        }
 
-        const response = await axios.post(
-          `https://api.imgbb.com/1/upload?key=${imageHostKey}`,
-          bodyData,
-          {
-            headers: {
-              ...bodyData.getHeaders(),
-            },
+        // Check if the element is in base64 format
+        const isBase64 = element.startsWith("data:image");
+
+        if (isBase64) {
+          // Process base64 image data
+          const bodyData = new FormData();
+          const imageData = element.split(",")[1]?.trim();
+
+          if (!imageData) {
+            console.error("Image data is undefined at index:", index);
+            continue;
           }
-        );
 
-        const imageUrl = response.data.data.url;
+          bodyData.append("image", imageData);
 
-        updatedImages.push(imageUrl);
+          const response = await axios.post(
+            `https://api.imgbb.com/1/upload?key=${imageHostKey}`,
+            bodyData,
+            {
+              headers: {
+                ...bodyData.getHeaders(),
+              },
+            }
+          );
+
+          const imageUrl = response.data.data.url;
+          updatedImages.push(imageUrl);
+        } else {
+          // Image is sent as a direct name
+          updatedImages.push(element);
+        }
       }
     }
 
-    // Find the product by ID and update its details
+    // Find the product by ID
+    const existingProduct = await product.findById(req.params.id);
+
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Remove deleted images from existing images
+
+    // Concatenate the new images and the remaining images
+    updatedImages = [...updatedImages];
+
+    // Update the product with new details and images
     const updatedProduct = await product.findByIdAndUpdate(
       req.params.id,
       {
@@ -90,13 +122,10 @@ exports.updateProductById = async (req, res) => {
         category,
         price,
         details,
-        images
+        images: updatedImages,
       },
+      { new: true } // Return the updated document
     );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
 
     res.json({
       data: updatedProduct,
@@ -109,7 +138,6 @@ exports.updateProductById = async (req, res) => {
       .json({ error: error.message || "An error occurred" });
   }
 };
-
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -137,8 +165,6 @@ exports.getProductById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 exports.deleteProductById = async (req, res) => {
   try {
