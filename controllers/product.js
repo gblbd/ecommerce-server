@@ -68,11 +68,9 @@ exports.updateProductById = async (req, res) => {
           continue;
         }
 
-        // Check if the element is in base64 format
         const isBase64 = element.startsWith("data:image");
 
         if (isBase64) {
-          // Process base64 image data
           const bodyData = new FormData();
           const imageData = element.split(",")[1]?.trim();
 
@@ -96,25 +94,19 @@ exports.updateProductById = async (req, res) => {
           const imageUrl = response.data.data.url;
           updatedImages.push(imageUrl);
         } else {
-          // Image is sent as a direct name
           updatedImages.push(element);
         }
       }
     }
 
-    // Find the product by ID
     const existingProduct = await product.findById(req.params.id);
 
     if (!existingProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Remove deleted images from existing images
-
-    // Concatenate the new images and the remaining images
     updatedImages = [...updatedImages];
 
-    // Update the product with new details and images
     const updatedProduct = await product.findByIdAndUpdate(
       req.params.id,
       {
@@ -124,7 +116,7 @@ exports.updateProductById = async (req, res) => {
         details,
         images: updatedImages,
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     res.json({
