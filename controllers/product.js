@@ -36,8 +36,6 @@ exports.addProduct = async (req, res) => {
       details,
       images,
     });
-
-    // Save the product to the database
     await newProduct.save();
 
     res.json({
