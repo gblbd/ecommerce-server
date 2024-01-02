@@ -98,7 +98,7 @@ exports.signin = (req, res, next) => {
 //show user list
 exports.userListData = async (req, res) => {
   try {
-    const test = await User.find({});
+    const test = await User.find({ role: "user" });
 
     res.json(test);
   } catch (error) {
