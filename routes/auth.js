@@ -6,9 +6,9 @@ const {
   signup,
   signin,
   userListData,
-  userDelete,
   read,
   userUpdateData,
+  userDelete,
 } = require("../controllers/auth");
 const { authenticate } = require("../middleware/authurize");
 // import validators
@@ -21,7 +21,7 @@ const { runValidation } = require("../validators");
 router.post("/signup", userSignupValidator, runValidation, signup);
 router.post("/signin", userSigninValidator, runValidation, signin);
 router.get("/user-list", userListData);
-router.delete("/user-delete", authenticate, userDelete);
+router.delete("/delete-user/:userId", authenticate, userDelete);
 router.get("/user-details", authenticate, read);
 router.put("/user-update", authenticate, userUpdateData);
 module.exports = router;
