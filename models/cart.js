@@ -11,7 +11,7 @@ const cartSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 });
 

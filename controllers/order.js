@@ -1,4 +1,4 @@
-const cart = require("../models/cart");
+const Cart = require("../models/cart");
 const Order = require("../models/order");
 const moment = require("moment");
 
@@ -8,18 +8,21 @@ exports.postOrder = async (req, res) => {
   const orderId = `${currentDateTime}`;
 
   try {
-    const result = await Order.create({
-      orderId: orderId,
-      userId: userId,
-      cartId: req.body.cartId,
+    const orderItems = req.body.cartDetails.map((cartItem) => ({
+      productId: cartItem.productId,
+      quantity: cartItem.quantity,
+      // totalPrice: cartItem.totalPrice,
+    }));
+    const subtotal = req.body.subtotal;
+
+    const createdOrder = await Order.create({
+      orderId,
+      userId,
+      cartItems: orderItems,
+      subtotal: subtotal,
     });
 
-    await cart.updateMany(
-      { _id: { $in: req.body.cartId } },
-      { $set: { orderStatus: true } }
-    );
-
-    return res.status(201).json({ success: true, data: result });
+    return res.status(201).json({ success: true, data: createdOrder });
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ error: "Order placement failed" });
@@ -31,12 +34,16 @@ exports.getOrders = async (req, res) => {
 
   try {
     const orders = await Order.find({ userId: userId }).populate({
-      path: "cartId",
-      populate: {
-        path: "productId",
-        model: "Product",
-      },
+      path: "userId",
     });
+    await Promise.all(
+      orders.map(async (order) => {
+        await Order.populate(order, {
+          path: "cartItems.productId",
+          model: "Product",
+        });
+      })
+    );
 
     res.status(200).json({ success: true, data: orders });
   } catch (error) {
@@ -47,17 +54,18 @@ exports.getOrders = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate({
-        path: "userId",
-      })
-      .populate({
-        path: "cartId",
-        populate: {
-          path: "productId",
+    // await Order.deleteMany();
+    const orders = await Order.find({}).populate({
+      path: "userId",
+    });
+    await Promise.all(
+      orders.map(async (order) => {
+        await Order.populate(order, {
+          path: "cartItems.productId",
           model: "Product",
-        },
-      });
+        });
+      })
+    );
 
     res.status(200).json({ success: true, data: orders });
   } catch (error) {

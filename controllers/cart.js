@@ -4,7 +4,7 @@ exports.getCart = async (req, res) => {
   try {
     const result = await Cart.find({
       userId: req.ID,
-      orderStatus: false,
+      orderStatus: true,
     }).populate("userId productId");
     res.status(201).json({ message: "Cart fetch good", result });
   } catch (error) {
@@ -21,7 +21,7 @@ exports.addToCart = async (req, res) => {
     let cartItem = await Cart.findOne({
       userId,
       productId,
-      orderStatus: false,
+      orderStatus: true,
     });
 
     if (cartItem) {

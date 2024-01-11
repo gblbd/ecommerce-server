@@ -6,14 +6,21 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    cartId: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "Cart",
-    },
     orderId: {
       type: String,
       unique: true,
     },
+    cartItems: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        quantity: Number,
+        // totalPrice: Number,
+      },
+    ],
+    subtotal: Number,
   },
   {
     timestamps: true,
