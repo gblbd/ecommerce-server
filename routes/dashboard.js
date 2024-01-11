@@ -3,18 +3,18 @@ const router = express.Router();
 
 // import controller
 const {
-  categoreyDataUpload,
-  categoreyDataList,
-  deleteCategoreyData,
+  categoryDataUpload,
+  categoryDataList,
+  deletecategoryData,
   uploadProductsData,
   productListData,
   editProductData,
 } = require("../controllers/dashboard");
 const { authenticate } = require("../middleware/authurize");
 
-router.post("/categorey-upload", authenticate, categoreyDataUpload);
-router.get("/categorey-data-list", authenticate, categoreyDataList);
-router.delete("/categorey-data-delete", authenticate, deleteCategoreyData);
+router.post("/category-upload", authenticate, categoryDataUpload);
+router.get("/category-data-list", authenticate, categoryDataList);
+router.delete("/category-data-delete", authenticate, deletecategoryData);
 router.post("/upload-product", authenticate, uploadProductsData);
 router.patch("/edit-product", authenticate, editProductData);
 router.get("/product-list", productListData);

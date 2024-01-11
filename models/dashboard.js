@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 // user schema
 const productDataScheama = new mongoose.Schema(
   {
-    categoreyId: {
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Categorey",
+      ref: "category",
     },
 
     productTitle: {

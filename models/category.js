@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 // user schema
-const categoreyScheama = new mongoose.Schema(
+const categoryScheama = new mongoose.Schema(
   {
-    categoreyName: {
+    categoryName: {
       type: String,
       trim: true,
       max: 32,
@@ -12,4 +12,4 @@ const categoreyScheama = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Categorey", categoreyScheama);
+module.exports = mongoose.model("Category", categoryScheama);

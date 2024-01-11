@@ -1,15 +1,15 @@
 const { Axios, default: axios } = require("axios");
-const Categorey = require("../models/categorey");
+const Category = require("../models/category");
 const ProductsData = require("../models/dashboard");
 const FormData = require("form-data");
 const imageHostKey = "79e6ec2db50a9ac8dbdb3b42a1accc92";
-//create categorey
-exports.categoreyDataUpload = async (req, res) => {
+//create category
+exports.categoryDataUpload = async (req, res) => {
   try {
-    const { categoreyName } = req.body;
+    const { categoryName } = req.body;
 
-    const newPostData = new Categorey({
-      categoreyName,
+    const newPostData = new Category({
+      categoryName,
     });
     newPostData.save((err, data) => {
       if (err) {
@@ -27,9 +27,9 @@ exports.categoreyDataUpload = async (req, res) => {
 
 //show cateorey list
 
-exports.categoreyDataList = async (req, res) => {
+exports.categoryDataList = async (req, res) => {
   try {
-    const result = await Categorey.find({});
+    const result = await Category.find({});
     return res.json(result);
   } catch (error) {
     return res.status(400).json(error);
@@ -37,11 +37,11 @@ exports.categoreyDataList = async (req, res) => {
 };
 
 //delete cateorey  information from the list
-exports.deleteCategoreyData = async (req, res) => {
+exports.deletecategoryData = async (req, res) => {
   try {
     const id = req.query.id;
     console.log("catory", id);
-    await Categorey.deleteOne({ _id: id });
+    await Category.deleteOne({ _id: id });
 
     res.json({ message: "successfully deleted" });
   } catch (error) {
@@ -52,7 +52,7 @@ exports.deleteCategoreyData = async (req, res) => {
 /* upload product list */
 exports.uploadProductsData = async (req, res) => {
   const {
-    categoreyId,
+    categoryId,
 
     productTitle,
     productDetails,
@@ -82,7 +82,7 @@ exports.uploadProductsData = async (req, res) => {
 
     // Create and save the news data
     const newPostData = new ProductsData({
-      categoreyId,
+      categoryId,
 
       productTitle,
       productDetails,
@@ -108,7 +108,7 @@ exports.uploadProductsData = async (req, res) => {
 //edit product
 exports.editProductData = async (req, res) => {
   const {
-    categoreyId,
+    categoryId,
 
     productTitle,
     productDetails,
@@ -127,8 +127,8 @@ exports.editProductData = async (req, res) => {
     // Create a FormData object and append the image data if provided
     const update = {};
 
-    if (categoreyId) {
-      update.categoreyId = categoreyId;
+    if (categoryId) {
+      update.categoryId = categoryId;
     }
 
     if (productTitle) {
