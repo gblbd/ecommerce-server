@@ -9,7 +9,23 @@ const productSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  productKey: {
+    type: String,
+    require: true,
+  },
   price: {
+    type: String,
+    require: true,
+  },
+  gender: {
+    type: String,
+    require: true,
+  },
+  quantity: {
+    type: Number,
+    require: true,
+  },
+  weigth: {
     type: String,
     require: true,
   },
