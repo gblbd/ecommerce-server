@@ -11,7 +11,7 @@ exports.addProduct = async (req, res) => {
       productKey,
       price,
       gender,
-      Quantity,
+      quantity,
       weigth,
       details,
     } = req.body;
@@ -44,7 +44,7 @@ exports.addProduct = async (req, res) => {
       productKey,
       price,
       gender,
-      Quantity,
+      quantity,
       weigth,
       details,
       images,
@@ -65,8 +65,16 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProductById = async (req, res) => {
   try {
-    const { title, category, price, details, images } = req.body;
-    console.log("check", req.body);
+    const {
+      title,
+      category,
+      productKey,
+      price,
+      gender,
+      quantity,
+      weigth,
+      details,
+    } = req.body;
 
     let updatedImages = [];
 
@@ -123,7 +131,11 @@ exports.updateProductById = async (req, res) => {
       {
         title,
         category,
+        productKey,
         price,
+        gender,
+        quantity,
+        weigth,
         details,
         images: updatedImages,
       },
