@@ -74,6 +74,7 @@ exports.updateProductById = async (req, res) => {
       quantity,
       weigth,
       details,
+      images,
     } = req.body;
 
     let updatedImages = [];
@@ -193,5 +194,17 @@ exports.deleteProductById = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+exports.checkProductKey = async (req, res) => {
+  const { productKey } = req.params;
+  try {
+    const existingProduct = await product.findOne({
+      productKey: { $regex: new RegExp(productKey, "i") },
+    });
+    res.json({ available: !existingProduct });
+  } catch (error) {
+    console.error("Error checking product key availability:", error);
+    res.status(500).json({ error: "error getting product key" });
   }
 };
