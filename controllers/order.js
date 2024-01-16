@@ -1,6 +1,7 @@
 const Cart = require("../models/cart");
 const Order = require("../models/order");
 const moment = require("moment");
+const Product = require("../models/product");
 
 exports.postOrder = async (req, res) => {
   const userId = req.ID;
@@ -11,16 +12,44 @@ exports.postOrder = async (req, res) => {
     const orderItems = req.body.cartDetails.map((cartItem) => ({
       productId: cartItem.productId,
       quantity: cartItem.quantity,
-      // totalPrice: cartItem.totalPrice,
     }));
     const subtotal = req.body.subtotal;
 
+    for (const orderItem of orderItems) {
+      const product = await Product.findById(orderItem.productId);
+
+      if (!product) {
+        console.error(`Product with ID ${orderItem.productId} not found.`);
+        return res
+          .status(404)
+          .json({ error: `Product with ID ${orderItem.productId} not found.` });
+      }
+
+      if (product.quantity < orderItem.quantity) {
+        console.error(
+          `Insufficient quantity for product with ID ${orderItem.productId}.`
+        );
+        return res.status(400).json({
+          error: `Insufficient quantity for ${product.title}.`,
+        });
+      }
+    }
+
+    // Create order and update product quantities
     const createdOrder = await Order.create({
       orderId,
       userId,
       cartItems: orderItems,
       subtotal: subtotal,
     });
+
+    for (const orderItem of orderItems) {
+      const product = await Product.findById(orderItem.productId);
+
+      // Update product quantities
+      product.quantity -= orderItem.quantity;
+      await product.save();
+    }
 
     return res.status(201).json({ success: true, data: createdOrder });
   } catch (error) {
