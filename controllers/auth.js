@@ -8,7 +8,7 @@ exports.signup = (req, res, next) => {
   try {
     User.findOne({ email }).exec((err, user) => {
       if (user) {
-        return res.json("User email Already exists");
+        return res.status(400).json({ user: "User email Already exists" });
       } else {
         let newUser = new User({
           name,
