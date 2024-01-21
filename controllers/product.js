@@ -1,6 +1,7 @@
 const { default: axios } = require("axios");
 const product = require("../models/product");
 const FormData = require("form-data");
+const order = require("../models/order");
 const imageHostKey = "79e6ec2db50a9ac8dbdb3b42a1accc92";
 
 exports.addProduct = async (req, res) => {
@@ -206,5 +207,40 @@ exports.checkProductKey = async (req, res) => {
   } catch (error) {
     console.error("Error checking product key availability:", error);
     res.status(500).json({ error: "error getting product key" });
+  }
+};
+
+exports.topSellingProduct = async (req, res) => {
+  try {
+    const topSellingProducts = await order.aggregate([
+      {
+        $unwind: "$cartItems",
+      },
+      {
+        $group: {
+          _id: "$cartItems.productId",
+          totalQuantitySold: { $sum: "$cartItems.quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      {
+        $sort: { totalQuantitySold: -1 },
+      },
+      {
+        $limit: 5, // Adjust the limit as needed
+      },
+    ]);
+
+    res.json(topSellingProducts);
+  } catch (error) {
+    console.error("Error fetching top-selling products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
