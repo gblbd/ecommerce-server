@@ -210,6 +210,22 @@ exports.checkProductKey = async (req, res) => {
   }
 };
 
+exports.checkUpdateProductKey = async (req, res) => {
+  const { productKey, currentProductId } = req.query;
+
+  try {
+    const existingProduct = await product.findOne({
+      _id: { $ne: currentProductId },
+      productKey: { $regex: new RegExp(req.params.productKey, "i") },
+    });
+
+    res.json({ available: !existingProduct, existingProduct });
+  } catch (error) {
+    console.error("Error checking product key availability:", error);
+    res.status(500).json({ error: "error getting product key" });
+  }
+};
+
 exports.topSellingProduct = async (req, res) => {
   try {
     const topSellingProducts = await order.aggregate([
