@@ -234,7 +234,7 @@ exports.topSellingProduct = async (req, res) => {
         $sort: { totalQuantitySold: -1 },
       },
       {
-        $limit: 6, // Adjust the limit as needed
+        $limit: 6,
       },
     ]);
 
