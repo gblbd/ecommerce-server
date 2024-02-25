@@ -46,6 +46,17 @@ exports.editCategory = async (req, res) => {
         .status(400)
         .json({ error: "Category ID and new name are required" });
     }
+    const existingCategory = await Category.findOne({
+      categoryName: { $regex: new RegExp(`^${newCategoryName}$`, "i") },
+    });
+
+    if (existingCategory) {
+      return res
+        .status(400)
+        .json({
+          error: "Category name already exists. Choose a different name.",
+        });
+    }
 
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
